@@ -4,12 +4,11 @@
   "description": "HashCode 2018 solution for qualification round",
   "main": "index.js",
   "scripts": {
-    "start": "npm run input_1 && npm run input_2 && npm run input_3 && npm run input_4 && npm run input_5",
-    "input_1": "node index.js ./inputs/a_example.in ./outputs/output_a.txt",
-    "input_2": "node index.js ./inputs/b_should_be_easy.in ./outputs/output_b.txt",
-    "input_3": "node index.js ./inputs/c_no_hurry.in ./outputs/output_c.txt",
-    "input_4": "node index.js ./inputs/d_metropolis.in ./outputs/output_d.txt",
-    "input_5": "node index.js ./inputs/e_high_bonus.in ./outputs/output_e.txt"
+    "start": "npm run input_1 && npm run input_2 && npm run input_3 && npm run input_4",
+    "input_1": "node index.js ./inputs/first_adventure.in ./outputs/output_first.txt",
+    "input_2": "node index.js ./inputs/second_adventure.in ./outputs/output_second.txt",
+    "input_3": "node index.js ./inputs/third_adventure.in ./outputs/output_third.txt",
+    "input_4": "node index.js ./inputs/fourth_adventure.in ./outputs/output_fourth.txt"
   },
   "repository": {
     "type": "git",

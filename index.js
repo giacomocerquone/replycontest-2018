@@ -1,72 +1,40 @@
-var fs = require('fs');
-var glpk = require('../dist/glpk.min.js');
+const fs = require('fs');
+const { cplex, readCplexFromString, score } = require('./lib/gplk.util.js')
 
-let score = 0
-
-//********** glpk library functions **********//
-
-function saveToFile(lp, filename) {
-  var fd = fs.openSync(filename, 'w');
-  if (fd){
-      glpk.glp_write_lp(lp, null,
-          function(str){
-              var buf = new Buffer(str + '\n');
-              fs.writeSync(fd, buf, 0, buf.length, null);
-          }
-      );
-      fs.closeSync(fd);
-  }
-}
-
-function readCplexFromFile(lp, filename) {
-  var str = fs.readFileSync(filename).toString();
-  var pos = 0;
-  glpk.glp_read_lp(lp, null,
-      function(){
-          if (pos < str.length){
-              return str[pos++];
-          } else
-              return -1;
-      }
-  )
-}
-
-
-cplex = function(file){
-  var lp = glpk.glp_create_prob();
-  readCplexFromFile(lp, __dirname + "/" + file);
-  var smcp = new glpk.SMCP({presolve: glpk.GLP_ON});
-  glpk.glp_simplex(lp, smcp);
-
-  var iocp = new glpk.IOCP({presolve: glpk.GLP_ON});
-  glpk.glp_intopt(lp, iocp);
-
-  score += glpk.glp_mip_obj_val(lp)
-
-  console.log("obj: " + score);
-
-  let result = {}, objective = glpk.glp_get_obj_val(lp);
-  for(i = 1; i <= glpk.glp_get_num_cols(lp); i++){
-      result[glpk.glp_get_col_name(lp, i)] = glpk.glp_get_col_prim (lp, i);
-  }
-  console.log(result)
-};
-
-require("repl").start("");
 //glpk.glp_set_print_func(console.log);
-//mathprog("todd.mod");
-
-
-//********** Algorithm **********/
 
 let in_file = fs.readFileSync(process.argv[2], 'utf8');
 let single_rows = in_file.split('\n'),
     first_line = single_rows[0],
-    first_line_el = single_rows[0].split(' ')
+    first_line_el = single_rows[0].split(' '),
+    V = first_line_el[0],
+    S = first_line_el[1],
+    C = first_line_el[2],
+    P = first_line_el[3];
 
 single_rows.shift()
 single_rows.splice(-1, 1)
 
+let textModel = `Minimize
+ obj: + 10 x1 + 6 x2 + 4 x3
+
+Subject To
+ p: + x3 + x2 + x1 <= 100
+ q: + 5 x3 + 4 x2 + 10 x1 <= 600
+ r: + 6 x3 + 2 x2 + 2 x1 <= 300
+
+Integer
+x0
+x1
+x2
+
+End`
+
+let { result, objective } = cplex(textModel)
+
+console.log(V, S, C, P);
+
+/*
 //LOOP finché c'è almeno una variabile con coefficiente > 0
 while(true) {
   let structure = []
@@ -111,9 +79,9 @@ while(true) {
 
   //// console.log(objFun + constraintsRides + constraintsCars + constraintsBin);
   fs.writeFileSync(process.argv[3], objFun + constraintsRides + constraintsCars + constraintsBin)
-  cplex(process.argv[3]);
 
 }
 
 
 console.log("Lo score totale è: " + score);
+*/
